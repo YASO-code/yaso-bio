@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>YASO | BOSS LEVEL</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+        }
+
+        /* GİRİŞ PERDESİ */
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999999;
+            cursor: pointer;
+        }
+
+        .blink {
+            font-size: 22px;
+            font-weight: bold;
+            letter-spacing: 5px;
+            animation: b 1.2s infinite;
+            color: #fff;
+        }
+
+        @keyframes b {
+            0%, 100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
+
+        /* ARKA PLAN */
+        #bg-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+            filter: brightness(0.6) contrast(1.2);
+            display: none;
+        }
+
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+            background: radial-gradient(circle at center, rgba(255, 69, 0, 0.2) 0%, transparent 80%);
+            opacity: 0.7;
+        }
+
+        #main-content {
+            position: relative;
+            z-index: 100;
+            height: 100vh;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            perspective: 1000px;
+        }
+
+        /* PROFİL KONTEYNER */
+        .profile-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .avatar-wrapper {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ff4500;
+            position: relative;
+            z-index: 5;
+        }
+
+        .aries-frame {
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            right: -8px;
+            bottom: -8px;
+            border: 3px solid #ff4500;
+            border-radius: 50%;
+            box-shadow: 0 0 25px #ff4500;
+            animation: pulse 1.5s infinite alternate;
+            z-index: 1;
+        }
+
+        @keyframes pulse {
+            from {
+                transform: scale(1);
+            }
+
+            to {
+                transform: scale(1.06);
+            }
+        }
+
+        /* NEON HOVER SÖZÜ (GÜNCELLENDİ) */
+        .hover-quote {
+            position: absolute;
+            left: 180px; /* Biraz daha uzaklaştırdım */
+            width: 280px;
+            text-align: left;
+            font-size: 15px;
+            font-weight: 900;
+            color: #ff4500;
+            /* Neon Efekti */
+            text-shadow: 0 0 10px #ff4500, 0 0 20px #ff0000, 0 0 30px #ff0000;
+            opacity: 0;
+            transform: translateX(-30px);
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            background: rgba(0,0,0,0.4);
+            padding: 15px;
+            border-radius: 12px;
+            border-left: 4px solid #ff4500;
+            letter-spacing: 1px;
+            line-height: 1.4;
+        }
+
+        .avatar-wrapper:hover + .hover-quote {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* 3D RGB YASO YAZISI */
+        .user-name {
+            font-size: 3.5rem;
+            letter-spacing: 10px;
+            margin-bottom: 5px;
+            font-weight: 900;
+            text-transform: uppercase;
+            background: linear-gradient(to right, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 400% 400%;
+            animation: rainbow 5s ease infinite, rotate3D 10s linear infinite;
+            display: inline-block;
+            transform-style: preserve-3d;
+        }
+
+        @keyframes rainbow {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes rotate3D {
+            0%, 50% {
+                transform: rotateY(0deg);
+            }
+
+            75% {
+                transform: rotateY(180deg);
+            }
+
+            100% {
+                transform: rotateY(360deg);
+            }
+        }
+
+        .user-bio {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        /* DISCORD LOGO */
+        .personal-dc-wrapper {
+            position: relative;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .personal-dc {
+            text-decoration: none;
+            color: white;
+            background: rgba(114, 137, 218, 0.1);
+            width: 50px;
+            height: 50px;
+            border-radius: 25px;
+            border: 1px solid #7289da;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: all 0.5s ease;
+            backdrop-filter: blur(5px);
+        }
+
+            .personal-dc i {
+                font-size: 1.5rem;
+                min-width: 50px;
+            }
+
+        .dc-text {
+            max-width: 0;
+            opacity: 0;
+            white-space: nowrap;
+            transition: all 0.5s ease;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .personal-dc:hover {
+            width: 180px;
+            background: #7289da;
+            box-shadow: 0 0 25px #7289da;
+        }
+
+            .personal-dc:hover .dc-text {
+                max-width: 150px;
+                opacity: 1;
+                margin-left: -5px;
+                margin-right: 15px;
+            }
+
+        /* MÜZİK ÇALAR */
+        .music-player {
+            width: 440px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 69, 0, 0.2);
+            padding: 15px 20px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: absolute;
+            bottom: 50px;
+        }
+
+        .song-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 69, 0, 0.4);
+            object-fit: cover;
+        }
+
+        .player-body {
+            flex-grow: 1;
+            text-align: left;
+        }
+
+        .title {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            color: #ff4500;
+            text-shadow: 0 0 10px #ff4500;
+            animation: neonB 1s infinite alternate;
+        }
+
+        @keyframes neonB {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 5px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px #fff;
+        }
+
+        .time-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: rgba(255,255,255,0.5);
+            font-family: monospace;
+            margin-bottom: 8px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            font-size: 18px;
+        }
+
+            .controls i {
+                cursor: pointer;
+                transition: 0.2s;
+                color: #fff;
+            }
+
+                .controls i:hover {
+                    color: #ff4500;
+                    transform: scale(1.1);
+                }
+
+        /* SAĞ ALT VİDEO */
+        .mini-video-link {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 210px;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid rgba(255, 69, 0, 0.3);
+            z-index: 1000;
+            transition: 0.4s;
+            display: none;
+            text-decoration: none;
+        }
+
+            .mini-video-link:hover {
+                transform: scale(1.05);
+                box-shadow: 0 0 25px #ff4500;
+            }
+
+        #mini-video {
+            width: 100%;
+            display: block;
+        }
+
+        .v-label {
+            display: block;
+            background: #ff4500;
+            color: white;
+            text-align: center;
+            font-size: 10px;
+            padding: 6px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="overlay" onclick="startApp()">
+        <p class="blink">TIKLA VE GİR</p>
+    </div>
+
+    <div id="particles"></div>
+    <video id="bg-video" loop playsinline><source src="video.mp4" type="video/mp4"></video>
+
+    <div id="main-content">
+        <div class="profile-header">
+            <div class="profile-container">
+                <div class="avatar-wrapper">
+                    <div class="aries-frame"></div>
+                    <img src="profil.jpg" class="avatar">
+                </div>
+                <div class="hover-quote">Çakkallar Meydanda Gezerken Ben Avlanmaya Devam edicem</div>
+            </div>
+
+            <h1 class="user-name">YASO</h1>
+            <p class="user-bio">yasocumm • Sabun</p>
+
+            <div class="personal-dc-wrapper">
+                <a href="https://discord.com/channels/@me" target="_blank" class="personal-dc">
+                    <i class="fab fa-discord"></i>
+                    <span class="dc-text">Discord Profilim</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="music-player">
+            <img src="indir.jpg" class="song-img">
+            <div class="player-body">
+                <p class="title">UZİ x CASHFLOW x ORGANİZE - KURTLAR VADİSİ</p>
+                <div class="progress-container" onclick="seek(event)"><div class="progress-bar" id="p-bar"></div></div>
+                <div class="time-info"><span id="c-time">0:00</span><span>3:07</span></div>
+                <div class="controls">
+                    <i class="fas fa-step-backward" onclick="resetTrack()"></i>
+                    <i class="fas fa-pause" id="play-icon" onclick="togglePlay()"></i>
+                    <i class="fas fa-step-forward" onclick="resetTrack()"></i>
+                </div>
+            </div>
+        </div>
+
+        <a href="https://discord.gg/8B92KQTze" target="_blank" class="mini-video-link" id="m-link">
+            <video id="mini-video" loop muted playsinline disablePictureInPicture><source src="2video.mp4" type="video/mp4"></video>
+            <span class="v-label">HDFilimDUCK JOIN</span>
+        </a>
+    </div>
+
+    <script>
+        let isPlaying = true;
+        const bg = document.getElementById('bg-video');
+        const mini = document.getElementById('mini-video');
+        const bar = document.getElementById('p-bar');
+        const curTxt = document.getElementById('c-time');
+
+        function startApp() {
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('main-content').style.display = 'flex';
+        document.getElementById('m-link').style.display = 'block';
+        bg.style.display = 'block';
+        bg.play().catch(() => { bg.muted = true; bg.play(); });
+        mini.play();
+
+        setInterval(() => {
+        if (isPlaying) {
+        let ct = bg.currentTime;
+        bar.style.width = (ct / bg.duration) * 100 + "%";
+        let m = Math.floor(ct / 60), s = Math.floor(ct % 60);
+        curTxt.innerText = m + ":" + (s < 10 ? "0" : "") + s;
+        }
+        }, 500);
+        }
+
+        function togglePlay() {
+        const icon = document.getElementById('play-icon');
+        isPlaying = !isPlaying;
+        icon.className = isPlaying ? "fas fa-pause" : "fas fa-play";
+        isPlaying ? bg.play() : bg.pause();
+        }
+
+        function resetTrack() { bg.currentTime = 0; }
+
+        function seek(e) {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        bg.currentTime = (clickX / rect.width) * bg.duration;
+        }
+    </script>
+</body>
+</html>
